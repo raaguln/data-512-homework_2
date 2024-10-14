@@ -26,11 +26,175 @@ wikipedia.org/wiki/Category:Politicians_by_nationality) was crawled to generate 
 4. [ORES API](https://www.mediawiki.org/wiki/ORES) - Object Revision Evaluation API gives us the prediction of the quality of a Wikipedia article.
 5. [urllib](https://docs.python.org/3/library/urllib.request.html) is a python library to fetch data from API and load it in our scripts.
 
+### Access Token and ORES API
 
-## Data Files
+To use the ORES API, you'll need an access token. Here's how to get one:
+
+1. Create a Wikimedia Account: If you don't have one already, sign up for a Wikimedia account. This is the same account you use for Wikipedia.
+2. Get an Access Token: Follow the steps in this guide to generate an access token: [Link to guide](https://api.wikimedia.org/wiki/Authentication).
+
+Important: When you create your access token, you'll get a Client ID, Client secret, and Access token. Save these carefully, as they won't be shown again. If you lose any of them, you can create a new access token.
+
+
 ### Input
+The below csv files are available in the resources folder of this repository
+
+1. [politicians_by_country_AUG.2024.csv](politicians_by_country_AUG.2024.csv): List of Wikipedia articles about politicians
+```csv
+name, url, country
+"Majah Ha Adrif","https://en.wikipedia.org/wiki/Majah_Ha_Adrif","Afghanistan"
+"Haroon al-Afghani","https://en.wikipedia.org/wiki/Haroon_al-Afghani","Afghanistan"
+...
+
+
+About the data -
+1. name (string): full name of the person
+2. url (string): URL of the corresponding Wikipedia article for each person
+3. country (string): country of origin for each person
+
+```
+2. [population_by_country_AUG.2024.csv](population_by_country_AUG.2024.csv): Population data by country
+```csv
+Geography,Population
+WORLD,8009
+AFRICA,1453
+NORTHERN AFRICA,256
+Algeria,46.8
+Egypt,105.2
+Libya,6.9
+...
+
+
+About the data -
+1. geography (string): geographic region or country
+2. population (integer): population count for the corresponding geography
+
+```
+
 
 ### Generated
+The below csv files are present in the generated_files folder of this repository -
+1. [wp_politicians_by_country.csv](wp_politicians_by_country.csv): Combined data on politicians, countries, and article quality
+```csv
+,article_title,country,revision_id,article_quality,region,population
+0,Majah Ha Adrif,Afghanistan,1233202991,Start,SOUTH ASIA,42.4
+1,Haroon al-Afghani,Afghanistan,1230459615,B,SOUTH ASIA,42.4
+...
+
+
+About the data -
+1. article_title (string): Stores the title of the Wikipedia article.
+2. country (string): Stores the country associated with the article.
+3. revision_id (integer): Stores the unique identifier for the article revision.
+4. article_quality (string): Stores the assessed quality of the article (e.g., "Start", "B").
+5. region (string): Stores the geographic region of the country.
+6. population (float): Stores the population of the country (with decimal points).
+```
+2. [wp_countries-no_match.txt](wp_countries-no_match.txt): Countries with no matches between datasets
+```txt
+San Marino
+Reunion
+Western Sahara
+Andorra
+Curacao
+Ireland
+Sao Tome and Principe
+Korean
+Brunei
+Jamaica
+...
+
+
+About the data -
+Contains list of countries
+```
+3. [wiki_page_info.json](wiki_page_info.json): Contains the data dump of articles and their latest revision ids, based on info extracted from MediaWiki API.
+```json
+{
+  "article_title_1": {
+    "pageid": 12345, # int - Page ID on Wikipedia
+    "ns": 0, # int - Namespace ID
+    "title": "Article Title 1", # string - Title of the article
+    "lastrevid": 67890, # int - Last revision ID
+    "touched": "YYYY-MM-DDTHH:MM:SSZ" # string - Timestamp when the page was last edited
+  },
+  "article_title_2": {
+    "pageid": 67890,
+    "ns": 0,
+    "title": "Article Title 2",
+    "lastrevid": 13579,
+    "touched": "YYYY-MM-DDTHH:MM:SSZ"
+  },
+  ... 
+}
+
+About the data -
+  - pageid:  The unique identifier for the Wikipedia page.
+  - ns: The namespace of the page (typically 0 for articles).
+  - title: The title of the Wikipedia article.
+  - lastrevid: The ID of the last revision of the article.
+  - touched: The timestamp indicating when the page was last modified.
+```
+- [ores_info.json](ores_info.json): Contains a list of articles with their latest revision ids and corresponding article rating, based on the response from ORES API.
+```json
+{
+    "Abdul Baqi Turkistani": {
+        "httpCode": 504,
+        "httpReason": "upstream request timeout"
+    },
+    "Abdul Ghani Ghani": {
+        "enwiki": {
+            "models": {
+                "articlequality": {
+                    "version": "0.9.2"
+                }
+            },
+            "scores": {
+                "1227026187": {
+                    "articlequality": {
+                        "score": {
+                            "prediction": "Stub",
+                            "probability": {
+                                "B": 0.011385918433177827,
+                                "C": 0.01746636720083123,
+                                "FA": 0.0023603522965185463,
+                                "GA": 0.005156605723717649,
+                                "Start": 0.0518527973277106,
+                                "Stub": 0.9117779590180441
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    ...
+}
+
+
+About the data -
+1. article_title (string): Stores the name of the Wikipedia article (e.g., "Abdul Baqi Turkistani", "Abdul Ghani Ghani").
+2. httpCode (integer): Stores the HTTP status code for the article's data retrieval (e.g., 504).
+3. httpReason (string): Stores the reason for the HTTP status code (e.g., "upstream request timeout").
+4. enwiki (object): Contains data specific to the English Wikipedia.
+models (object): Contains information about the models used for analysis.
+articlequality (object): Contains data related to the article's quality assessment.
+5. version (string): Stores the version of the article quality model.
+scores (object): Contains quality scores for specific article revisions.
+6. revision_id (integer): Stores the unique identifier for the article revision.
+7. articlequality (object): Contains the detailed article quality assessment.
+8. score (object): Contains the final quality prediction and probability distribution.
+9. prediction (string): Stores the predicted article quality class (e.g., "Stub").
+10. probability (object): Stores the probability distribution for different quality classes.
+11. quality_class (string): Stores the individual quality class (e.g., "B", "C", "FA", "GA", "Start", "Stub").
+12. probability_value (float): Stores the probability value associated with the quality class.
+```
+
+## Gotchas / Issues / Special considerations
+1. When fetching data from ORES API, we hit 504 Gateway Timeout errors randomly, and this might lead to slightly different analysis results every time you run the scripts. Should not be a major difference.
+2. The ORES API calls to all 7k+ articles  takes approx. 2 hours to run, so sit back and grab some more popcorn while this runs. This is [exactly how long the process will run for](https://www.youtube.com/watch?v=oMrfhk-MXRg).
+3. We make use of 
+
 
 ## Research Implications
 We found some interesting patterns. The number and quality of articles varied a lot depending on where you looked. This suggests that Wikipedia might have some biases in how it covers political figures.
