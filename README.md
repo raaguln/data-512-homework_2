@@ -15,8 +15,7 @@ We will also perform an analysis of how the coverage of politicians on Wikipedia
 2. This dataset was created in accordance with the [Wikimedia Foundation Terms of Use](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use), which states that we are good to create this dataset and use it for our analysis as long as we don't violate their UCoC and other terms and policies. Summary of the Terms of Use: According to Wikimedia's terms, any data extracted from Wikipedia must attribute the source and be shared under the same or compatible license. For this project, any dataset created must acknowledge the Wikimedia Foundation and must not be used in a manner that violates the privacy of Wikipedia's contributors or users.
 
 ### Source data
-1. The Wikipedia [Category:Politicians by nationality](https://en.
-wikipedia.org/wiki/Category:Politicians_by_nationality) was crawled to generate a list of Wikipedia article pages about politicians from a wide range of countries. It has the list of information about the article name, url, and country the politician is/was associated to. Can be found in the repository as `politicians_by_country.AUG.2024.csv`.
+1. The Wikipedia [Category:Politicians by nationality](https://en.wikipedia.org/wiki/Category:Politicians_by_nationality) was crawled to generate a list of Wikipedia article pages about politicians from a wide range of countries. It has the list of information about the article name, url, and country the politician is/was associated to. Can be found in the repository as `politicians_by_country.AUG.2024.csv`.
 2. The population data is available in CSV format as `population_by_country_AUG.2024.csv` in the repository. This dataset was downloaded from the [world population data sheet](https://www.prb.org/international/indicator/population/table) published by the Population Reference Bureau. It contains rows that provide cumulative regional population counts. These rows are distinguished by having ALL CAPS values in the 'geography' field (e.g. AFRICA, OCEANIA).
 
 ## API Documentation/References
@@ -193,11 +192,18 @@ scores (object): Contains quality scores for specific article revisions.
 ## Gotchas / Issues / Special considerations
 1. When fetching data from ORES API, we hit 504 Gateway Timeout errors randomly, and this might lead to slightly different analysis results every time you run the scripts. Should not be a major difference.
 2. The ORES API calls to all 7k+ articles  takes approx. 2 hours to run, so sit back and grab some more popcorn while this runs. This is [exactly how long the process will run for](https://www.youtube.com/watch?v=oMrfhk-MXRg).
-3. We make use of 
+3. We will need access token to make the API calls, and since this analysis was done in Google Colab, it has an internal mechanism to implement sensitive ENV variables. Refer `1. Setup` section.
+4. In the analysis part of `7.1`, Monaco and Tuvalu seem to have Inf values. This is because the original data has population values as 0 for them. This was not fixed as just modifying those values would not be the right way to proceed with the analysis.
+5. When we are combining the two datasets (population and politicians) in `step 6`, we use an Inner Join to perform the merge. Inner join selects records that have matching values in both tables, which is exaclty what we need.
+6. It seems like there are 7155 - 7111 = 44 duplicate values for politicians, but they belong to different countries. Care must be taken to not discard them as it is as they are associated with different countries. To highlight - a politician is associated with two different countries, but there is only one Wiki article with the name of the politician. It is impossible to have two wiki articles with same title name as it would break the URL of the webpage. Looking into Wikipedia naming strategies, it is aparent that they include additional details in the article title for similar names (usually extra information in round brackets). Refer the sample articles below - 
+
+    - Jack Sparrow - https://en.wikipedia.org/wiki/Jack_Sparrow
+    - Jack Sparrow (song) - https://en.wikipedia.org/wiki/Jack_Sparrow_(song)
+7. The above does not affect our analysis, as Wikipedia always has unique titles. So for rows where same politician is associated with 2 or more countries, same data needs to be applied.
 
 
 ## Research Implications
-We found some interesting patterns. The number and quality of articles varied a lot depending on where you looked. This suggests that Wikipedia might have some biases in how it covers political figures.
+We found some interesting patterns. The number and quality of articles varied a lot depending on where you looked. This suggests that Wikipedia might have some biases in how it covers political figures. Additionally, the top countries by article count don’t always match those with the highest-quality articles, proving that more coverage doesn’t always mean better content.
 
 Why might that be? Well, to start with, having access to the internet and knowing how to use it makes a big difference in how much people can contribute to Wikipedia. Countries with fewer people online or who aren't as comfortable with technology might have fewer articles. Second, a country's politics and culture can influence whether people want to write or edit articles about their politicians. Restrive governments like North Korea and China might have fewer people willing to write articles, fearing negative consequences for any mistakes. And finally, how well people in different countries understand English can also affect the quality and quantity of articles.
 
