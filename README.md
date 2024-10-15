@@ -38,7 +38,7 @@ Important: When you create your access token, you'll get a Client ID, Client sec
 ### Input
 The below csv files are available in the resources folder of this repository
 
-1. [politicians_by_country_AUG.2024.csv](politicians_by_country_AUG.2024.csv): List of Wikipedia articles about politicians
+1. [politicians_by_country_AUG.2024.csv](raw_data/politicians_by_country_AUG.2024.csv): List of Wikipedia articles about politicians
 ```csv
 name, url, country
 "Majah Ha Adrif","https://en.wikipedia.org/wiki/Majah_Ha_Adrif","Afghanistan"
@@ -52,7 +52,7 @@ About the data -
 3. country (string): country of origin for each person
 
 ```
-2. [population_by_country_AUG.2024.csv](population_by_country_AUG.2024.csv): Population data by country
+2. [population_by_country_AUG.2024.csv](raw_data/population_by_country_AUG.2024.csv): Population data by country
 ```csv
 Geography,Population
 WORLD,8009
@@ -73,7 +73,7 @@ About the data -
 
 ### Generated
 The below csv files are present in the generated_files folder of this repository -
-1. [wp_politicians_by_country.csv](wp_politicians_by_country.csv): Combined data on politicians, countries, and article quality
+1. [wp_politicians_by_country.csv](final_data/wp_politicians_by_country.csv): Combined data on politicians, countries, and article quality
 ```csv
 ,article_title,country,revision_id,article_quality,region,population
 0,Majah Ha Adrif,Afghanistan,1233202991,Start,SOUTH ASIA,42.4
@@ -89,7 +89,7 @@ About the data -
 5. region (string): Stores the geographic region of the country.
 6. population (float): Stores the population of the country (with decimal points).
 ```
-2. [wp_countries-no_match.txt](wp_countries-no_match.txt): Countries with no matches between datasets
+2. [wp_countries-no_match.txt](final_data/wp_countries-no_match.txt): Countries with no matches between datasets
 ```txt
 San Marino
 Reunion
@@ -107,7 +107,7 @@ Jamaica
 About the data -
 Contains list of countries
 ```
-3. [wiki_page_info.json](wiki_page_info.json): Contains the data dump of articles and their latest revision ids, based on info extracted from MediaWiki API.
+3. [wiki_page_info.json](intermediate_data/wiki_page_info.json): Contains the data dump of articles and their latest revision ids, based on info extracted from MediaWiki API.
 ```json
 {
   "article_title_1": {
@@ -134,7 +134,7 @@ About the data -
   - lastrevid: The ID of the last revision of the article.
   - touched: The timestamp indicating when the page was last modified.
 ```
-- [ores_info.json](ores_info.json): Contains a list of articles with their latest revision ids and corresponding article rating, based on the response from ORES API.
+4. [ores_info.json](intermediate_data/ores_info.json): Contains a list of articles with their latest revision ids and corresponding article rating, based on the response from ORES API.
 ```json
 {
     "Abdul Baqi Turkistani": {
